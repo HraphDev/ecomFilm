@@ -1,0 +1,75 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Edit Classical Film{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+    <h1>Edit Classical Film: {{ film.title }}</h1>
+
+    <form action="{{ path('classical_edit', {'id': film.id}) }}" method="POST">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ film.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" required>{{ film.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="releaseDate">Release Date</label>
+            <input type="date" id="releaseDate" name="releaseDate" class="form-control" value="{{ film.releaseDate|date('Y-m-d') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ film.price }}" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="imagePath">Image Path</label>
+            <input type="text" id="imagePath" name="imagePath" class="form-control" value="{{ film.imagePath }}">
+        </div>
+
+        <div class="form-group">
+            <label for="videoPath">Video Path</label>
+            <input type="text" id="videoPath" name="videoPath" class="form-control" value="{{ film.videoPath }}">
+        </div>
+
+        <div class="form-group">
+            <label for="categories">Categories</label>
+            <select id="categories" name="categories[]" class="form-control" multiple>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category in film.categories %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="directors">Directors</label>
+            <select id="directors" name="directors[]" class="form-control" multiple>
+                {% for director in directors %}
+                    <option value="{{ director.id }}" {% if director in film.directors %}selected{% endif %}>{{ director.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="actors">Actors</label>
+            <select id="actors" name="actors[]" class="form-control" multiple>
+                {% for actor in actors %}
+                    <option value="{{ actor.id }}" {% if actor in film.actors %}selected{% endif %}>{{ actor.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+
+    <a href="{{ path('classical_index') }}">Back to List</a>
+       </div>
+        </div>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% include 'partials/header.html.twig' %}
+<br>
+
+<div class="container text-center mb-5">
+    <h1 class="display-4">Our Team Dev</h1>
+    <p class="lead font-italic">"Debugging is like being the detective in a crime movie where you're also the murderer."</p>
+    <hr class="my-4">
+</div>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ asset('images/developer1.jpg') }}" class="card-img-top" alt="Developer 1">
+                <div class="card-body">
+                    <h5 class="card-title">Achraf Bouhia</h5>
+                    <p class="card-text">Full Stack Developer</p>
+                    <p>Specializes in backend development and database management. Expert in PHP and Symfony framework.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ asset('images/developer2.jpg') }}" class="card-img-top" alt="Developer 2">
+                <div class="card-body">
+                    <h5 class="card-title">Rayyan Belhafyane</h5>
+                    <p class="card-text">Frontend Developer</p>
+                    <p>Creates beautiful and responsive user interfaces using modern web technologies.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ asset('images/developer3.jpg') }}" class="card-img-top" alt="Developer 3">
+                <div class="card-body">
+                    <h5 class="card-title">Sanaa Bensoltana</h5>
+                    <p class="card-text">UX Designer</p>
+                    <p>Focuses on creating intuitive user experiences and modern design solutions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'partials/footer.html.twig' %}

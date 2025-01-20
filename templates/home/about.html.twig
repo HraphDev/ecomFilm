@@ -1,0 +1,44 @@
+{% include 'partials/header.html.twig' %}
+
+<br> 
+<br>
+<br>
+{# fill content here #}
+<section class="container mx-auto px-4 py-12">
+    {# About Section #}
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">About MovieZone</h1>
+        <div class="max-w-3xl mx-auto">
+            <p class="text-lg text-gray-600 mb-4">
+                Welcome to ecomFilm, your premier destination for digital entertainment. We offer a vast collection of movies, cartoons, and TV series for your viewing pleasure.
+            </p>
+            <p class="text-lg text-gray-600 mb-4">
+                Our platform provides a seamless streaming experience with high-quality content for all ages. Browse through our extensive library and discover new favorites at competitive prices.
+            </p>
+            <p class="text-lg text-gray-600 mb-4">
+                With secure payment options and instant access, enjoying your favorite content has never been easier.
+            </p>
+        </div>
+    </div>
+
+    {# Sponsors Section #}
+    <div class="mt-16">
+        <h2 class="text-3xl font-semibold text-center mb-8">Our Trusted Partners</h2>
+        <div class="sponsor-images">
+            <div class="sponsor-item">
+                <img src="{{ asset('images/sponsor1.jpg') }}" alt="Sponsor 1">
+            </div>
+            <div class="sponsor-item">
+                <img src="{{ asset('images/sponsor2.jpg') }}" alt="Sponsor 2">
+            </div>
+            <div class="sponsor-item">
+                <img src="{{ asset('images/sponsor3.jpg') }}" alt="Sponsor 3">
+            </div>
+            <div class="sponsor-item">
+                <img src="{{ asset('images/sponsor4.jpg') }}" alt="Sponsor 4">
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'partials/footer.html.twig' %}

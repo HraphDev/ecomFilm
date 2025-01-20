@@ -1,0 +1,118 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Edit Series{% endblock %}
+
+{% block content %}
+  <!-- Series CRUD -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <center>
+            <h5 class="card-title">Edit Series</h5>
+          </center>
+          <a href="{{ path('series_index') }}" class="btn btn-primary">Back to Series List</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Series Edit Form -->
+  <div class="card">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT"> <!-- For PUT method in Symfony -->
+        
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" class="form-control" id="title" name="title" value="{{ series.title }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="seasons" class="form-label">Seasons</label>
+          <input type="number" class="form-control" id="seasons" name="seasons" value="{{ series.seasons }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="episodes" class="form-label">Episodes</label>
+          <input type="number" class="form-control" id="episodes" name="episodes" value="{{ series.episodes }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="price" class="form-label">Price</label>
+          <input type="number" class="form-control" id="price" name="price" value="{{ series.price }}" step="0.01" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="releaseDate" class="form-label">Release Date</label>
+          <input type="date" class="form-control" id="releaseDate" name="releaseDate" value="{{ series.releaseDate|date('Y-m-d') }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Categories</label>
+          <div>
+            {% for category in categories %}
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="category_{{ category.id }}" name="categories[]" value="{{ category.id }}" {% if category in series.categories %}checked{% endif %}>
+                <label class="form-check-label" for="category_{{ category.id }}">{{ category.name }}</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Actors</label>
+          <div>
+            {% for actor in actors %}
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="actor_{{ actor.id }}" name="actors[]" value="{{ actor.id }}" {% if actor in series.actors %}checked{% endif %}>
+                <label class="form-check-label" for="actor_{{ actor.id }}">{{ actor.name }}</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Directors</label>
+          <div>
+            {% for director in directors %}
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="director_{{ director.id }}" name="directors[]" value="{{ director.id }}" {% if director in series.directors %}checked{% endif %}>
+                <label class="form-check-label" for="director_{{ director.id }}">{{ director.name }}</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Video Upload -->
+        <div class="mb-3">
+          <label for="video" class="form-label">Video</label>
+          <input type="file" class="form-control" id="video" name="video">
+          {% if series.videoPath %}
+            <div class="mt-2">
+              <p><strong>Current Video:</strong></p>
+              <video width="320" height="240" controls>
+                <source src="{{ asset(series.videoPath) }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Image Upload -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Image</label>
+          <input type="file" class="form-control" id="image" name="image">
+          {% if series.imagePath %}
+            <div class="mt-2">
+              <p><strong>Current Image:</strong></p>
+              <img src="{{ asset(series.imagePath) }}" alt="Series Image" class="img-fluid" style="max-height: 200px;">
+            </div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,210 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+
+home:
+    path: /
+    controller: App\Controller\HomeController::index
+about:
+    path: /about
+    controller: App\Controller\HomeController::about
+Team:
+    path: /team
+    controller: App\Controller\HomeController::OurTeam
+movies:
+    path: /movies
+    controller: App\Controller\MovieController::index
+cartoons:
+    path: /cartoons
+    controller: App\Controller\CartoonsController::index
+
+profile:
+    path: /profile
+    controller: App\Controller\ProfileController::index
+    
+login:
+    path: /login
+    controller: App\Controller\SecurityController::login
+
+register:
+    path: /register
+    controller: App\Controller\RegistrationController::register
+
+logout:
+    path: /logout
+    controller: App\Controller\SecurityController::logout
+series:
+    path: /series
+    controller: App\Controller\SeriesController::index
+contact:
+    path: /contact
+    controller: App\Controller\ContactController::index
+
+
+
+
+# ADMIN PATIE : 
+admin_dashboard:
+    path: /admin/dashboard
+    controller: App\Controller\AdminController::index
+
+admin_movies:
+    path: /admin/movies
+    controller: App\Controller\FilmController::index
+
+admin_cartoons:
+    path: /admin/cartoons
+    controller: App\Controller\AdminController::cartoons
+
+admin_series:
+    path: /admin/series
+    controller: App\Controller\AdminController::series
+
+admin_users:
+    path: /admin/users
+    controller: App\Controller\AdminController::users
+
+admin_classical_films:
+    path: /admin/classical_films
+    controller: App\Controller\AdminController::classicalFilms
+
+
+
+# movies
+
+admin_films_create:
+  path: /admin/films/create
+  controller: App\Controller\FilmController::create
+
+admin_films_edit:
+  path: /admin/films/edit/{id}
+  controller: App\Controller\FilmController::edit
+  requirements:
+    id: \d+  # Ensures that the 'id' is a number
+
+admin_films_delete:
+  path: /admin/films/delete/{id}
+  controller: App\Controller\FilmController::delete
+  requirements:
+    id: \d+  # Ensures that the 'id' is a number
+
+
+
+
+
+#directory
+# config/routes/directory.yaml
+# Directors routes
+
+director_index:
+    path: /director
+    controller: App\Controller\DirectorController::index
+
+director_create:
+    path: /admin/director/create
+    controller: App\Controller\DirectorController::create
+
+director_edit:
+    path: /admin/director/edit/{id}
+    controller: App\Controller\DirectorController::edit
+
+director_delete:
+    path: /admin/director/delete/{id}
+    controller: App\Controller\DirectorController::delete
+
+
+#category
+# config/routes/category.yaml
+
+category_index:
+    path: /category
+    controller: App\Controller\CategoryController::index
+
+category_create:
+    path: /admin/category/create
+    controller: App\Controller\CategoryController::create
+
+category_edit:
+    path: /admin/category/edit/{id}
+    controller: App\Controller\CategoryController::edit
+
+category_delete:
+    path: /admin/category/delete/{id}
+    controller: App\Controller\CategoryController::delete
+ 
+ #series
+# config/routes.yaml
+
+series_index:
+    path: /series
+    controller: App\Controller\SeriesController::index
+
+series_create:
+    path: /admin/series/create
+    controller: App\Controller\SeriesController::create
+
+series_edit:
+    path: /admin/series/edit/{id}
+    controller: App\Controller\SeriesController::edit
+    requirements:
+        id: \d+
+
+series_delete:
+    path: /admin/series/delete/{id}
+    controller: App\Controller\SeriesController::delete
+    requirements:
+        id: \d+
+
+
+
+#cartoon 
+cartoon_index:
+    path: /cartoons
+    controller: App\Controller\CartoonsController::index
+
+cartoon_create:
+    path: /admin/cartoons/create
+    controller: App\Controller\CartoonsController::create
+
+cartoon_edit:
+    path: /admin/cartoons/{id}/edit
+    controller: App\Controller\CartoonsController::edit
+
+cartoon_delete:
+    path: /admin/cartoons/{id}/delete
+    controller: App\Controller\CartoonsController::delete
+
+
+#classics
+
+classical_index:
+    path: /classical
+    controller: App\Controller\ClassicalController::index
+
+classical_new:
+    path: /admin/classic/new
+    controller: App\Controller\ClassicalController::new
+
+classical_edit:
+    path: /admin/classic/{id}/edit
+    controller: App\Controller\ClassicalController::edit
+    requirements:
+        id: \d+
+
+classical_delete:
+    path: /admin/classic/{id}/delete
+    controller: App\Controller\ClassicalController::delete
+    requirements:
+        id: \d+
+
+#user 
+user_index:
+    path: /users
+    controller: App\Controller\UserController::index
+
+user_edit:
+    path: /user/{id}/edit
+    controller: App\Controller\UserController::edit

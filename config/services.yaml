@@ -1,0 +1,24 @@
+parameters:
+    profile_pictures_directory: '%kernel.project_dir%/public/uploads/profile_pictures'
+    upload_directory: '%kernel.project_dir%/public/uploads'
+
+services:
+    _defaults:
+        autowire: true  # Automatically injects dependencies into your services
+        autoconfigure: true  # Automatically registers your services with appropriate tags
+
+    # Register all classes in the 'src' folder as services, excluding specific directories
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Register the AuthenticationSuccessListener with the correct event class (LoginSuccessEvent)
+    App\EventListener\AuthenticationSuccessListener:
+        arguments:
+            $router: '@router'
+            $requestStack: '@request_stack'
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.authentication.success', method: 'onLoginSuccess' }

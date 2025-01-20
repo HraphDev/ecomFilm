@@ -1,0 +1,42 @@
+{% include 'partials/header.html.twig' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block body %}
+<div class="container mx-auto mt-10 px-4">
+    <h1 class="text-center text-3xl font-bold text-gray-800 mb-8">Contact Us</h1>
+
+    {% if successMessage %}
+        <div class="alert alert-success text-center mb-4">{{ successMessage }}</div>
+    {% elseif errorMessage %}
+        <div class="alert alert-danger text-center mb-4">{{ errorMessage }}</div>
+    {% endif %}
+
+    <div class="bg-white p-6 shadow-lg rounded-lg max-w-lg mx-auto">
+        <form action="{{ path('contact') }}" method="POST" class="space-y-6">
+            <div class="form-group">
+                <label for="name" class="form-label font-semibold">Your Name</label>
+                <input type="text" id="name" name="name" class="form-control border rounded-md p-3 w-full focus:ring-2 focus:ring-blue-400" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label font-semibold">Your Email</label>
+                <input type="email" id="email" name="email" class="form-control border rounded-md p-3 w-full focus:ring-2 focus:ring-blue-400" required>
+            </div>
+
+            <div class="form-group">
+                <label for="message" class="form-label font-semibold">Your Message</label>
+                <textarea id="message" name="message" class="form-control border rounded-md p-3 w-full h-32 focus:ring-2 focus:ring-blue-400" required></textarea>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="px-6 py-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-all focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% include 'partials/footer.html.twig' %}

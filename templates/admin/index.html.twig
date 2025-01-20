@@ -1,0 +1,50 @@
+
+      {% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <center>
+                    <h5 class="card-title">Manage Movies</h5>
+                  </center>
+                  <a href="{{ path('admin_movies') }}" class="btn btn-primary">Go to Movies</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <center>
+                    <h5 class="card-title">Manage Series</h5>
+                  </center>
+                  <a href="{{ path('admin_series') }}" class="btn btn-success">Go to Series</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <center>
+                    <h5 class="card-title">Manage Cartoons</h5>
+                  </center>
+                  <a href="{{ path('admin_cartoons') }}" class="btn btn-warning">Go to Cartoons</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <center>
+                <h1 class="card-title">Featured Content</h1>
+              </center>
+              <div id="contentCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner" id="carouselItems">
+                  <!-- Dynamic content will go here -->
+                </div>
+              </div>
+        {% endblock %}

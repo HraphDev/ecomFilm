@@ -1,0 +1,58 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Dashboard - Movies{% endblock %}
+
+{% block content %}
+  <!-- Movies CRUD -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <center>
+            <h5 class="card-title">Manage Movies</h5>
+          </center>
+          <a href="{{ path('admin_films_create') }}" class="btn btn-primary">Add New Movie</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movie List -->
+  <div class="card">
+    <div class="card-body">
+      <center>
+        <h1 class="card-title">Movie List</h1>
+      </center>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Category</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for film in films %}
+            <tr>
+              <td>{{ film.title }}</td>
+              <td>
+                {% for category in film.categories %}
+                  {{ category.name }} {# or another property of the Category entity #}
+                  {% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                <a href="{{ path('admin_films_edit', {'id':  film.id}) }}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{{ path('admin_films_delete', {'id':  film.id}) }}" class="btn btn-danger btn-sm">Delete</a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="3" class="text-center">No movies available</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

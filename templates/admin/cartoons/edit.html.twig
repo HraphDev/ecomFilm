@@ -1,0 +1,45 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Edit Cartoon{% endblock %}
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <center>
+    <h1>Edit Cartoon: {{ cartoon.title }}</h1>
+</center>
+    <form action="{{ path('cartoon_edit', {'id': cartoon.id}) }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ cartoon.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" required>{{ cartoon.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="releaseDate">Release Date</label>
+            <input type="date" id="releaseDate" name="releaseDate" class="form-control" value="{{ cartoon.releaseDate|date('Y-m-d') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ cartoon.price }}" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="imagePath">Image</label>
+            <input type="file" id="imagePath" name="imagePath" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="videoPath">Video</label>
+            <input type="file" id="videoPath" name="videoPath" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+
+    <a href="{{ path('cartoon_index') }}">Back to List</a>
+{% endblock %}

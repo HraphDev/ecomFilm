@@ -1,0 +1,82 @@
+.sidebar {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.sidebar-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0,1);
+    z-index: 1;
+}
+
+#sidebar button,
+#sidebar ul {
+    position: relative;
+    z-index: 2;
+}
+
+
+
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+#myVideo {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    filter: brightness(50%);
+    animation: slowMotion 1s linear infinite;
+}
+
+@keyframes slowMotion {
+    from {
+        transform: scale(1.0);
+    }
+    to {
+        transform: scale(1.05);
+    }
+}
+
+/* Add some contrast for content */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.container-fluid {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+}
