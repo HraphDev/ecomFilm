@@ -15,7 +15,16 @@ class FilmRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Film::class);
     }
-
+    public function findByCategoryName(string $categoryName): array
+    {
+        return $this->createQueryBuilder('f')
+            ->innerJoin('f.categories', 'c')
+            ->where('c.name = :categoryName')
+            ->setParameter('categoryName', $categoryName)
+            ->getQuery()
+            ->getResult();
+    }
+    
     //    /**
     //     * @return Film[] Returns an array of Film objects
     //     */

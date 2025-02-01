@@ -23,52 +23,56 @@
             <input type="date" id="releaseDate" name="releaseDate" class="form-control" value="{{ film.releaseDate|date('Y-m-d') }}" required>
         </div>
 
+ <!-- Directors -->
+        <div class="mb-3">
+          <label for="directors" class="form-label">Directors</label>
+          <select class="form-select" id="directors" name="directors[]" multiple required>
+            {% for director in directors %}
+              <option value="{{ director.id }}" {% if director in film.directors %}selected{% endif %}>
+                {{ director.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <!-- Categories -->
+        <div class="mb-3">
+          <label for="categories" class="form-label">Categories</label>
+          <select class="form-select" id="categories" name="categories[]" multiple required>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if category in film.categories %}selected{% endif %}>
+                {{ category.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
         <div class="form-group">
             <label for="price">Price</label>
             <input type="number" id="price" name="price" class="form-control" value="{{ film.price }}" step="0.01" required>
         </div>
-
-        <div class="form-group">
-            <label for="imagePath">Image Path</label>
-            <input type="text" id="imagePath" name="imagePath" class="form-control" value="{{ film.imagePath }}">
+   
+        <!-- Image Upload -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Image</label>
+          <input type="file" class="form-control" id="image" name="imagePath">
+          {% if film.imagePath %}
+            <small class="form-text text-muted">Current image: <img src="{{ asset(film.imagePath) }}" alt="Image" width="100"></small>
+          {% endif %}
         </div>
-
-        <div class="form-group">
-            <label for="videoPath">Video Path</label>
-            <input type="text" id="videoPath" name="videoPath" class="form-control" value="{{ film.videoPath }}">
-        </div>
-
-        <div class="form-group">
-            <label for="categories">Categories</label>
-            <select id="categories" name="categories[]" class="form-control" multiple>
-                {% for category in categories %}
-                    <option value="{{ category.id }}" {% if category in film.categories %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="directors">Directors</label>
-            <select id="directors" name="directors[]" class="form-control" multiple>
-                {% for director in directors %}
-                    <option value="{{ director.id }}" {% if director in film.directors %}selected{% endif %}>{{ director.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="actors">Actors</label>
-            <select id="actors" name="actors[]" class="form-control" multiple>
-                {% for actor in actors %}
-                    <option value="{{ actor.id }}" {% if actor in film.actors %}selected{% endif %}>{{ actor.name }}</option>
-                {% endfor %}
-            </select>
+        
+        <!-- Video Upload -->
+        <div class="mb-3">
+          <label for="video" class="form-label">Video</label>
+          <input type="file" class="form-control" id="video"name="videoPath">
+          {% if film.videoPath %}
+            <small class="form-text text-muted">Current video: <a href="{{ asset(film.videoPath) }}" target="_blank">View Video</a></small>
+          {% endif %}
         </div>
 
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 
-    <a href="{{ path('classical_index') }}">Back to List</a>
        </div>
         </div>
 

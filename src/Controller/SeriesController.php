@@ -3,198 +3,164 @@
 namespace App\Controller;
 
 use App\Entity\Series;
-use App\Entity\Category;
-use App\Entity\Actor;
-use App\Entity\Director;
 use App\Repository\CategoryRepository;
 use App\Repository\DirectorRepository;
+use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use App\Repository\SeriesRepository;
-final class SeriesController extends AbstractController
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+class SeriesController extends AbstractController
 {
-    #[Route('/series', name: 'series_index')]
+    #[Route(path: "/admin/series", name: "admin_series")]
     public function index(SeriesRepository $seriesRepository): Response
     {
-        $seriesList = $seriesRepository->findAll();
-    
+        $series = $seriesRepository->findAll();
+
         return $this->render('admin/series.html.twig', [
-            'series' => $seriesList,
+            'series' => $series,
         ]);
     }
 
-    #[Route('/series/create', name: 'series_create')]
-    public function create(
-        Request $request,
-        CategoryRepository $categoryRepo,
-        DirectorRepository $directorRepo,
-        EntityManagerInterface $em
-    ): Response {
-        $categories = $categoryRepo->findAll();
-        $directors = $directorRepo->findAll();
-
+    #[Route(path: "/admin/series/create", name: "admin_series_create")]
+    public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
+    {
         if ($request->isMethod('POST')) {
             $series = new Series();
-            $series->setTitle($request->request->get('title'))
-                   ->setSeasons($request->request->get('seasons'))
-                   ->setEpisodes($request->request->get('episodes'))
-                   ->setPrice($request->request->get('price'))
-                   ->setReleaseDate(new \DateTime($request->request->get('releaseDate')))
-                   ->setDescription($request->request->get('description'));
+            $series->setTitle($request->request->get('title'));
+            $series->setDescription($request->request->get('description'));
+            $series->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $series->setPrice((float)$request->request->get('price'));
+            $series->setSeasons((int)$request->request->get('seasons'));
+            $series->setEpisodes((int)$request->request->get('episodes'));
 
-              // Handle Categories
-$categoryIds = $request->request->all('categories');
-if (!$categoryIds) {
-    $categoryIds = [];
-}
-$series->getCategories()->clear();
-foreach ($categoryIds as $categoryId) {
-    $category = $categoryRepo->find($categoryId);
-    if ($category) {
-        $series->addCategory($category);
-    }
-}
-
-// Handle Directors
-$directorIds = $request->request->all('directors');
-if (!$directorIds) {
-    $directorIds = [];
-}
-$series->getDirectors()->clear();
-foreach ($directorIds as $directorId) {
-    $director = $directorRepo->find($directorId);
-    if ($director) {
-        $series->addDirector($director);
-    }
-}
-
-            // Handle file uploads (image and video)
-            if ($videoFile = $request->files->get('video')) {
-                $videoPath = $this->handleFileUpload($videoFile, 'videos');
-                $series->setVideoPath($videoPath);
+            $categoryIds = $request->request->all('categories') ?? [];
+            foreach ((array)$categoryIds as $categoryId) {
+                $category = $categoryRepo->find($categoryId);
+                if ($category) {
+                    $series->addCategory($category);
+                }
             }
 
-            if ($imageFile = $request->files->get('image')) {
-                $imagePath = $this->handleFileUpload($imageFile, 'images');
-                $series->setImagePath($imagePath);
+            $directorIds = $request->request->all('directors') ?? [];
+            foreach ((array)$directorIds as $directorId) {
+                $director = $directorRepo->find($directorId);
+                if ($director) {
+                    $series->addDirector($director);
+                }
             }
 
-            // Persist the entity
-            $em->persist($series);
-            $em->flush();
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $series->setImagePath('uploads/images/' . $newFilename);
+            }
 
-            return $this->redirectToRoute('series_index');
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $series->setVideoPath('uploads/videos/' . $newFilename);
+            }
+
+            $entityManager->persist($series);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Series created successfully!');
+            return $this->redirectToRoute('admin_series');
         }
 
         return $this->render('admin/series/create.html.twig', [
-            'categories' => $categories,
-            'directors' => $directors,
-            'series' => new Series(),
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
         ]);
     }
 
-    #[Route('/series/edit/{id}', name: 'series_edit')]
-    public function edit(
-        Request $request,
-        Series $series,
-        CategoryRepository $categoryRepo,
-        DirectorRepository $directorRepo,
-        EntityManagerInterface $em
-    ): Response {
-        $categories = $categoryRepo->findAll();
-        $directors = $directorRepo->findAll();
+    #[Route(path: "/admin/series/edit/{id}", name: "admin_series_edit")]
+    public function edit(int $id, Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
+    {
+        $series = $entityManager->getRepository(Series::class)->find($id);
+
+        if (!$series) {
+            $this->addFlash('error', 'Series not found!');
+            return $this->redirectToRoute('admin_series');
+        }
 
         if ($request->isMethod('POST')) {
-            $series->setTitle($request->request->get('title'))
-                   ->setSeasons($request->request->get('seasons'))
-                   ->setEpisodes($request->request->get('episodes'))
-                   ->setPrice($request->request->get('price'))
-                   ->setReleaseDate(new \DateTime($request->request->get('releaseDate')))
-                   ->setDescription($request->request->get('description'));
+            $series->setTitle($request->request->get('title'));
+            $series->setDescription($request->request->get('description'));
+            $series->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $series->setPrice((float)$request->request->get('price'));
+            $series->setSeasons((int)$request->request->get('seasons'));
+            $series->setEpisodes((int)$request->request->get('episodes'));
 
-          // Handle Categories
-$categoryIds = $request->request->all('categories');
-if (!$categoryIds) {
-    $categoryIds = [];
-}
-$series->getCategories()->clear();
-foreach ($categoryIds as $categoryId) {
-    $category = $categoryRepo->find($categoryId);
-    if ($category) {
-        $series->addCategory($category);
-    }
-}
-
-// Handle Directors
-$directorIds = $request->request->all('directors');
-if (!$directorIds) {
-    $directorIds = [];
-}
-$series->getDirectors()->clear();
-foreach ($directorIds as $directorId) {
-    $director = $directorRepo->find($directorId);
-    if ($director) {
-        $series->addDirector($director);
-    }
-}
-
-
-            // Handle file uploads (image and video)
-            if ($videoFile = $request->files->get('video')) {
-                $videoPath = $this->handleFileUpload($videoFile, 'videos');
-                $series->setVideoPath($videoPath);
+            $categoryIds = $request->request->all('categories') ?? [];
+            $series->getCategories()->clear();
+            foreach ((array)$categoryIds as $categoryId) {
+                $category = $categoryRepo->find($categoryId);
+                if ($category) {
+                    $series->addCategory($category);
+                }
             }
 
-            if ($imageFile = $request->files->get('image')) {
-                $imagePath = $this->handleFileUpload($imageFile, 'images');
-                $series->setImagePath($imagePath);
+            $directorIds = $request->request->all('directors') ?? [];
+            $series->getDirectors()->clear();
+            foreach ((array)$directorIds as $directorId) {
+                $director = $directorRepo->find($directorId);
+                if ($director) {
+                    $series->addDirector($director);
+                }
             }
 
-            // Persist changes
-            $em->flush();
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $series->setImagePath('uploads/images/' . $newFilename);
+            }
 
-            return $this->redirectToRoute('series_index');
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $series->setVideoPath('uploads/videos/' . $newFilename);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Series updated successfully!');
+            return $this->redirectToRoute('admin_series');
         }
 
         return $this->render('admin/series/edit.html.twig', [
             'series' => $series,
-            'categories' => $categories,
-            'directors' => $directors,
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
         ]);
     }
 
-    #[Route('/series/delete/{id}', name: 'series_delete')]
-    public function delete(Series $series, EntityManagerInterface $em): Response
+    #[Route(path: "/admin/series/delete/{id}", name: "admin_series_delete")]
+    public function delete(int $id, EntityManagerInterface $entityManager): Response
     {
-        $em->remove($series);
-        $em->flush();
+        $series = $entityManager->getRepository(Series::class)->find($id);
 
-        return $this->redirectToRoute('series_index');
-    }
-
-    // Helper function to handle file uploads
-    private function handleFileUpload($file, $directory): ?string
-    {
-        // Generate a unique filename
-        $filename = uniqid() . '.' . $file->guessExtension();
-
-        try {
-            // Move the file to the designated directory
-            $file->move(
-                $this->getParameter('upload_directory') . '/' . $directory,
-                $filename
-            );
-        } catch (FileException $e) {
-            // Handle the error appropriately
-            $this->addFlash('error', 'Failed to upload the file.');
-            return null;
+        if (!$series) {
+            $this->addFlash('error', 'Series not found!');
+            return $this->redirectToRoute('admin_series');
         }
 
-        // Return the file path for database storage
-        return '/uploads/' . $directory . '/' . $filename;
+        $entityManager->remove($series);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Series deleted successfully!');
+        return $this->redirectToRoute('admin_series');
     }
 }

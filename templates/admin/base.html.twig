@@ -33,6 +33,10 @@
       z-index: 0;
       overflow: hidden;
     }
+    .table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+}
   </style>
 </head>
 
@@ -82,7 +86,7 @@
             <a href="{{ path('admin_movies') }}" class="nav-link text-white"><i class="fas fa-film me-2"></i>Movies</a>
           </li>
    <li class="nav-item mb-3">
-    <a class="nav-link" href="{{ path('series_index') }}">
+    <a class="nav-link text-white" href="{{ path('admin_series') }}">
         <i class="fas fa-tv me-2"></i>Series
     </a>
 </li>

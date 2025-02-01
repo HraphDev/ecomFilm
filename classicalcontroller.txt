@@ -1,0 +1,162 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\ClassicalFilm;
+use App\Repository\CategoryRepository;
+use App\Repository\DirectorRepository;
+use App\Repository\ClassicalFilmRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+class ClassicalController extends AbstractController
+{
+    #[Route('/admin/classical', name: 'classical_index')]
+    public function index(ClassicalFilmRepository $classicalFilmRepository): Response
+    {
+        $films = $classicalFilmRepository->findAll();
+
+        return $this->render('admin/classical_films.html.twig', [
+            'films' => $films,
+        ]);
+    }
+
+    #[Route('/admin/classical/create', name: 'classical_create')]
+    public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
+    {
+        if ($request->isMethod('POST')) {
+            $film = new ClassicalFilm();
+            $film->setTitle($request->request->get('title'));
+            $film->setDescription($request->request->get('description'));
+            $film->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $film->setPrice((float)$request->request->get('price'));
+
+            $categoryIds = $request->request->all('categories') ?? [];
+            foreach ((array)$categoryIds as $categoryId) {
+                $category = $categoryRepo->find($categoryId);
+                if ($category) {
+                    $film->addCategory($category);
+                }
+            }
+
+            $directorIds = $request->request->all('directors') ?? [];
+            foreach ((array)$directorIds as $directorId) {
+                $director = $directorRepo->find($directorId);
+                if ($director) {
+                    $film->addDirector($director);
+                }
+            }
+
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $film->setImagePath('uploads/images/' . $newFilename);
+            }
+
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $film->setVideoPath('uploads/videos/' . $newFilename);
+            }
+
+            $entityManager->persist($film);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Classical Film created successfully!');
+            return $this->redirectToRoute('classical_index');
+        }
+
+        return $this->render('admin/classical/create.html.twig', [
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
+        ]);
+    }
+
+    #[Route('/admin/classical/edit/{id}', name: 'classical_edit')]
+    public function edit(int $id, Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
+    {
+        $film = $entityManager->getRepository(ClassicalFilm::class)->find($id);
+
+        if (!$film) {
+            $this->addFlash('error', 'Classical Film not found!');
+            return $this->redirectToRoute('classical_index');
+        }
+
+        if ($request->isMethod('POST')) {
+            $film->setTitle($request->request->get('title'));
+            $film->setDescription($request->request->get('description'));
+            $film->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $film->setPrice((float)$request->request->get('price'));
+
+            $categoryIds = $request->request->all('categories') ?? [];
+            $film->getCategories()->clear();
+            foreach ((array)$categoryIds as $categoryId) {
+                $category = $categoryRepo->find($categoryId);
+                if ($category) {
+                    $film->addCategory($category);
+                }
+            }
+
+            $directorIds = $request->request->all('directors') ?? [];
+            $film->getDirectors()->clear();
+            foreach ((array)$directorIds as $directorId) {
+                $director = $directorRepo->find($directorId);
+                if ($director) {
+                    $film->addDirector($director);
+                }
+            }
+
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $film->setImagePath('uploads/images/' . $newFilename);
+            }
+
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $film->setVideoPath('uploads/videos/' . $newFilename);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Classical Film updated successfully!');
+            return $this->redirectToRoute('classical_index');
+        }
+
+        return $this->render('admin/classical/edit.html.twig', [
+            'film' => $film,
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
+        ]);
+    }
+
+    #[Route('/admin/classical/delete/{id}', name: 'classical_delete')]
+    public function delete(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $film = $entityManager->getRepository(ClassicalFilm::class)->find($id);
+
+        if (!$film) {
+            $this->addFlash('error', 'Classical Film not found!');
+            return $this->redirectToRoute('classical_index');
+        }
+
+        $entityManager->remove($film);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Classical Film deleted successfully!');
+        return $this->redirectToRoute('classical_index');
+    }
+}

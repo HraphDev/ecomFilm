@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Cartoon;
-use App\Entity\Category;
-use App\Entity\Director;
 use App\Repository\CategoryRepository;
 use App\Repository\DirectorRepository;
 use App\Repository\CartoonRepository;
@@ -12,184 +10,151 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CartoonsController extends AbstractController
 {
-    // List all cartoons
-    #[Route('/cartoons', name: 'cartoon_index')]
-    public function index(CartoonRepository $cartoonRepository ,CategoryRepository $categoryRepo ): Response
+    #[Route("/admin/cartoons", name: "admin_cartoons")]
+    public function index(CartoonRepository $cartoonRepository): Response
     {
-        // Get all cartoons
-        $cartoons = $cartoonRepository->findAll();
-        $categories = $categoryRepo->findAll();
         return $this->render('admin/cartoons.html.twig', [
-            'cartoons' => $cartoons,
-            'categories' => $categories
+            'cartoons' => $cartoonRepository->findAll(),
         ]);
     }
 
-    // Create a new cartoon
-    #[Route('/admin/cartoons/create', name: 'cartoon_create')]
+    #[Route("/admin/cartoons/create", name: "admin_cartoons_create")]
     public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
     {
         if ($request->isMethod('POST')) {
-            // Create a new cartoon object
             $cartoon = new Cartoon();
-            $title = $request->request->get('title');
-            $description = $request->request->get('description');
-            $releaseDate = new \DateTime($request->request->get('releaseDate'));
-            $price = $request->request->get('price');
+            $cartoon->setTitle($request->request->get('title'));
+            $cartoon->setDescription($request->request->get('description'));
+            $cartoon->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $cartoon->setPrice((float)$request->request->get('price'));
 
-            // Handle Categories (ensure it's always an array)
-            $categoryIds = $request->request->get('categories');
-            $categoryIds = is_array($categoryIds) ? $categoryIds : (array)$categoryIds;
-            foreach ($categoryIds as $categoryId) {
+            $categoryIds = $request->request->all('categories') ?? [];
+            foreach ((array)$categoryIds as $categoryId) {
                 $category = $categoryRepo->find($categoryId);
                 if ($category) {
                     $cartoon->addCategory($category);
                 }
             }
 
-            // Handle Directors (ensure it's always an array)
-            $directorIds = $request->request->get('directors');
-            $directorIds = is_array($directorIds) ? $directorIds : (array)$directorIds;
-            foreach ($directorIds as $directorId) {
+            $directorIds = $request->request->all('directors') ?? [];
+            foreach ((array)$directorIds as $directorId) {
                 $director = $directorRepo->find($directorId);
                 if ($director) {
                     $cartoon->addDirector($director);
                 }
             }
 
-            // Handle file uploads for image and video
-            $imageFile = $request->files->get('imagePath');
-            $videoFile = $request->files->get('videoPath');
-
-            if ($imageFile) {
-                $imagePath = 'uploads/' . uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move($this->getParameter('upload_directory'), $imagePath);
-                $cartoon->setImagePath($imagePath);
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $cartoon->setImagePath('uploads/images/' . $newFilename);
             }
 
-            if ($videoFile) {
-                $videoPath = 'uploads/' . uniqid() . '.' . $videoFile->guessExtension();
-                $videoFile->move($this->getParameter('upload_directory'), $videoPath);
-                $cartoon->setVideoPath($videoPath);
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $cartoon->setVideoPath('uploads/videos/' . $newFilename);
             }
 
-            // Set the basic cartoon details
-            $cartoon->setTitle($title)
-                ->setDescription($description)
-                ->setReleaseDate($releaseDate)
-                ->setPrice($price);
-
-            // Persist the cartoon to the database
             $entityManager->persist($cartoon);
             $entityManager->flush();
 
-            // Redirect to the cartoon's index page
-            return $this->redirectToRoute('cartoon_index');
+            $this->addFlash('success', 'Cartoon created successfully!');
+            return $this->redirectToRoute('admin_cartoons');
         }
 
-        // Fetch all categories and directors for the form
-        $categories = $categoryRepo->findAll();
-        $directors = $directorRepo->findAll();
-
         return $this->render('admin/cartoons/create.html.twig', [
-            'categories' => $categories,
-            'directors' => $directors,
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
         ]);
     }
 
-    // Edit an existing cartoon
-    #[Route('/admin/cartoons/{id}/edit', name: 'cartoon_edit')]
+    #[Route("/admin/cartoons/edit/{id}", name: "admin_cartoons_edit")]
     public function edit(int $id, Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
     {
         $cartoon = $entityManager->getRepository(Cartoon::class)->find($id);
 
         if (!$cartoon) {
-            throw new NotFoundHttpException('Cartoon not found');
+            $this->addFlash('error', 'Cartoon not found!');
+            return $this->redirectToRoute('admin_cartoons');
         }
 
         if ($request->isMethod('POST')) {
-            // Update cartoon details
-            $cartoon->setTitle($request->request->get('title'))
-                ->setDescription($request->request->get('description'))
-                ->setReleaseDate(new \DateTime($request->request->get('releaseDate')))
-                ->setPrice($request->request->get('price'));
+            $cartoon->setTitle($request->request->get('title'));
+            $cartoon->setDescription($request->request->get('description'));
+            $cartoon->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
+            $cartoon->setPrice((float)$request->request->get('price'));
 
-            // Clear existing categories and directors before adding new ones
             $cartoon->getCategories()->clear();
-            $cartoon->getDirectors()->clear();
-
-            // Handle Categories
-            $categoryIds = $request->request->get('categories');
-            $categoryIds = is_array($categoryIds) ? $categoryIds : (array)$categoryIds;
-            foreach ($categoryIds as $categoryId) {
+            $categoryIds = $request->request->all('categories') ?? [];
+            foreach ((array)$categoryIds as $categoryId) {
                 $category = $categoryRepo->find($categoryId);
                 if ($category) {
                     $cartoon->addCategory($category);
                 }
             }
 
-            // Handle Directors
-            $directorIds = $request->request->get('directors');
-            $directorIds = is_array($directorIds) ? $directorIds : (array)$directorIds;
-            foreach ($directorIds as $directorId) {
+            $cartoon->getDirectors()->clear();
+            $directorIds = $request->request->all('directors') ?? [];
+            foreach ((array)$directorIds as $directorId) {
                 $director = $directorRepo->find($directorId);
                 if ($director) {
                     $cartoon->addDirector($director);
                 }
             }
 
-            // Handle file uploads
-            $imageFile = $request->files->get('imagePath');
-            $videoFile = $request->files->get('videoPath');
-
-            if ($imageFile) {
-                $imagePath = 'uploads/' . uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move($this->getParameter('upload_directory'), $imagePath);
-                $cartoon->setImagePath($imagePath);
+            $imagePath = $request->files->get('imagePath');
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $cartoon->setImagePath('uploads/images/' . $newFilename);
             }
 
-            if ($videoFile) {
-                $videoPath = 'uploads/' . uniqid() . '.' . $videoFile->guessExtension();
-                $videoFile->move($this->getParameter('upload_directory'), $videoPath);
-                $cartoon->setVideoPath($videoPath);
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $cartoon->setVideoPath('uploads/videos/' . $newFilename);
             }
 
-            // Persist the updated cartoon
             $entityManager->flush();
 
-            // Redirect to the cartoon's index page
-            return $this->redirectToRoute('cartoon_index');
+            $this->addFlash('success', 'Cartoon updated successfully!');
+            return $this->redirectToRoute('admin_cartoons');
         }
 
-        // Fetch categories and directors for the form
-        $categories = $categoryRepo->findAll();
-        $directors = $directorRepo->findAll();
-
-        return $this->render('admin/cartoon/edit.html.twig', [
+        return $this->render('admin/cartoons/edit.html.twig', [
             'cartoon' => $cartoon,
-            'categories' => $categories,
-            'directors' => $directors,
+            'categories' => $categoryRepo->findAll(),
+            'directors' => $directorRepo->findAll(),
         ]);
     }
 
-    // Delete a cartoon
-    #[Route('/admin/cartoons/{id}/delete', name: 'cartoon_delete')]
+    #[Route("/admin/cartoons/delete/{id}", name: "admin_cartoons_delete")]
     public function delete(int $id, EntityManagerInterface $entityManager): Response
     {
         $cartoon = $entityManager->getRepository(Cartoon::class)->find($id);
 
         if (!$cartoon) {
-            throw new NotFoundHttpException('Cartoon not found');
+            $this->addFlash('error', 'Cartoon not found!');
+            return $this->redirectToRoute('admin_cartoons');
         }
 
         $entityManager->remove($cartoon);
         $entityManager->flush();
 
-        return $this->redirectToRoute('cartoon_index');
+        $this->addFlash('success', 'Cartoon deleted successfully!');
+        return $this->redirectToRoute('admin_cartoons');
     }
 }

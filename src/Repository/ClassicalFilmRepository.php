@@ -1,14 +1,13 @@
 <?php
 
+// App\Repository\ClassicalFilmRepository.php
+
 namespace App\Repository;
 
 use App\Entity\ClassicalFilm;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<ClassicalFilm>
- */
 class ClassicalFilmRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +15,14 @@ class ClassicalFilmRepository extends ServiceEntityRepository
         parent::__construct($registry, ClassicalFilm::class);
     }
 
-    //    /**
-    //     * @return ClassicalFilm[] Returns an array of ClassicalFilm objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?ClassicalFilm
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // Add this method to find films by category name
+    public function findByCategoryName(string $categoryName)
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.categories', 'cat') // Use 'categories' (plural) as defined in the entity
+            ->andWhere('cat.name = :categoryName')
+            ->setParameter('categoryName', $categoryName)
+            ->getQuery()
+            ->getResult();
+    }
 }

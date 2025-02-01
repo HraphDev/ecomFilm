@@ -9,8 +9,8 @@
         <h1 class="card-title">Add New Movie</h1>
       </center>
 
-      <form method="POST" enctype="multipart/form-data">
-        <!-- Title Field -->
+ <form action="{{ path('classical_new') }}" method="post" enctype="multipart/form-data">
+        {{ csrf_token('create_classical') }}        <!-- Title Field -->
         <div class="form-group">
           <label for="title">Title</label>
           <input type="text" class="form-control" id="title" name="title" value="{{ film.title ?? '' }}" required>
@@ -46,7 +46,10 @@
           <input type="file" class="form-control" id="videoPath" name="videoPath">
         </div>
 
-        <!-- Categories Checkbox -->
+       
+        <!-- Categories -->
+        <div class="mb-3">
+              <!-- Categories Checkbox -->
         <div class="form-group">
           <label for="categories">Categories</label>
           <div id="categories">
@@ -75,9 +78,8 @@
             {% endfor %}
           </div>
         </div>
-
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary">Save Movie</button>
+        <button type="submit" class="btn btn-primary">Save This Classic</button>
       </form>
     </div>
   </div>

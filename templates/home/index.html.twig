@@ -1,78 +1,135 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
-{% include 'partials/header.html.twig' %}
+{% include 'partials/header.html.twig' with {'cartoonsCategories': cartoonsCategories} %}
+
+<style>
+    .shop_section {
+        padding: 60px 0;
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        position: relative; 
+        border: 1px solid #e0e0e0;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+        overflow: hidden;
+        display: flex;
+        flex-direction: column; 
+        align-items: center; 
+        text-align: center; 
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card:hover .card-img-top {
+        filter: brightness(0.7); 
+    }
+
+    .card-img-top {
+        height: 100%; 
+        width: 100%; 
+        object-fit: cover; 
+        transition: all 0.3s ease; 
+    }
+
+    .card-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        display: none; 
+    }
+
+    .card:hover .card-text {
+        display: block;
+    }
+
+    .card-body {
+        display: none; 
+    }
+
+    @media (max-width: 768px) {
+        .heading_container h1 {
+            font-size: 28px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .heading_container h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+
 <body>
 <section class="hero-section custom-nav ">
     <div class="container text-center">
         <h1 class="text-4xl font-bold mb-4">Discover Amazing Movies</h1>
         <p class="text-lg mb-8">Stream your favorite content anytime, anywhere</p>
         <div class="d-flex gap-4 justify-content-center">
-            <a href="#" class="btn btn-danger px-5 py-3 rounded-pill">
-                Start Watching
+            <a href="{{ path('about') }}" class="btn btn-danger px-5 py-3 rounded-pill">
+                About Us
             </a>
-            <a href="#" class="btn btn-dark px-5 py-3 rounded-pill">
-                Browse Catalog
+            <a       href="{{ path('contact') }}" class="btn btn-dark px-5 py-3 rounded-pill">
+                Contact
             </a>
         </div>
     </div>
 </section>
-{# <section class="movies-carousel my-5">
-    <div class="container">
-        <h2 class="text-center mb-4">Featured Content</h2>
-        <div id="contentCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-inner">
-                {% for i in range(0, items|length, 4) %}
-                    <div class="carousel-item {% if loop.first %}active{% endif %}">
-                        <div class="row">
-                            {% for item in items|slice(i, 4) %}
-                                <div class="col-md-3">
-                                    <div class="card">
-                                        <img src="{{ item.image }}" class="card-img-top" alt="{{ item.title }}">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ item.title }}</h5>
-                                            <p class="card-text">{{ item.genre }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
+<br><br>
+<section class="section-animationB py-8">
+    <div class="container mx-auto px-4">
+        <div class="row d-flex justify-content-between">
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <a href="{{ url('movies_page') }}">
+                        <img src="{{ asset('img/movie.jpg') }}" class="card-img-top" alt="Movie">
+                        <div class="card-text">Movies</div> <!-- Text that appears on hover -->
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <a href="{{ url('series_page') }}">
+                        <img src="{{ asset('img/serie.jpg') }}" class="card-img-top" alt="Series">
+                        <div class="card-text">Series</div> <!-- Text that appears on hover -->
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <a href="{{ url('cartoons_page') }}">
+                        <img src="{{ asset('img/cartoon.jpg') }}" class="card-img-top" alt="Cartoon">
+                        <div class="card-text">Cartoons</div> <!-- Text that appears on hover -->
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                   <a href="{{ path('classicalfilms_page') }}">
+                        <img src="{{ asset('img/classic.jpg') }}" class="card-img-top" alt="Classical Film">
+                        <div class="card-text">Classical Films</div> <!-- Text that appears on hover -->
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="classics-section bg-light py-5">
-    <div class="container">
-        <h2 class="text-center mb-4">Monthly Classics</h2>
-        <div class="row mb-4">
-            <div class="col-12">
-                <p class="text-center">
-                    Each month, we carefully select three timeless classic films for our collectors. 
-                    These masterpieces are available for purchase in limited quantities, featuring 
-                    restored versions with exclusive bonus content.
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            {% for classic in classics %}
-                <div class="col-md-4">
-                    <div class="card h-100">
-                        <img src="{{ classic.image }}" class="card-img-top" alt="{{ classic.title }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ classic.title }}</h5>
-                            <p class="card-text">{{ classic.year }}</p>
-                            <a href="#" class="btn btn-primary">Buy Now</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</section> #}
 {% include 'partials/footer.html.twig' %}
+
 </body>
 </html>

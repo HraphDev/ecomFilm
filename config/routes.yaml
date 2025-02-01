@@ -8,18 +8,51 @@ controllers:
 home:
     path: /
     controller: App\Controller\HomeController::index
+
+movies_category:
+  path: /movies/category/{categoryName}
+  controller: App\Controller\HomeController::moviesByCategory
+  requirements:
+    categoryName: '[\w\s\-\/]+'  
+
+cartoons_category:
+  path: /cartoons/category/{categoryName}
+  controller: App\Controller\HomeController::cartoonsByCategory
+  requirements:
+    categoryName: '[\w\s\-\/]+' 
+
+series_category:
+  path: /series/category/{categoryName}
+  controller: App\Controller\HomeController::seriesByCategory
+  requirements:
+    categoryName: '[\w\s\-\/]+'  # Indentation fixed
+
+ 
+classicalfilms_page:
+  path: /classicalfilms
+  controller: App\Controller\HomeController::classicalFilmsPage
+
+classicalfilms_category:
+  path: /classicalfilms/category/{categoryName}
+  controller: App\Controller\HomeController::classicalFilmsByCategory
+  requirements:
+    categoryName: '[\w\s\-\/]+'  # Make sure the regular expression is quoted
+
 about:
     path: /about
     controller: App\Controller\HomeController::about
 Team:
     path: /team
     controller: App\Controller\HomeController::OurTeam
-movies:
+movies_page:
     path: /movies
-    controller: App\Controller\MovieController::index
-cartoons:
+    controller: App\Controller\HomeController::moviesPage
+cartoons_page:
     path: /cartoons
-    controller: App\Controller\CartoonsController::index
+    controller: App\Controller\HomeController::cartoonsPage
+series_page:
+    path: /series
+    controller: App\Controller\HomeController::seriesPage
 
 profile:
     path: /profile
@@ -45,6 +78,29 @@ contact:
 
 
 
+show_movie:
+    path: /film/{id}
+    controller: App\Controller\HomeController::showMovie
+    requirements:
+        id: \d+ 
+
+show_series:
+    path: /series/{id}
+    controller: App\Controller\HomeController::showSeries
+    requirements:
+        id: \d+  
+
+show_classicalfilm:
+    path: /classicalfilm/{id}
+    controller: App\Controller\HomeController::showClassicalFilm
+    requirements:
+        id: \d+  
+show_cartoon:
+    path: /cartoons/{id}
+    controller: App\Controller\HomeController::showCartoon
+    requirements:
+        id: \d+  
+
 
 # ADMIN PATIE : 
 admin_dashboard:
@@ -61,7 +117,7 @@ admin_cartoons:
 
 admin_series:
     path: /admin/series
-    controller: App\Controller\AdminController::series
+    controller: App\Controller\SeriesController::index
 
 admin_users:
     path: /admin/users
@@ -83,20 +139,19 @@ admin_films_edit:
   path: /admin/films/edit/{id}
   controller: App\Controller\FilmController::edit
   requirements:
-    id: \d+  # Ensures that the 'id' is a number
+    id: \d+ 
 
 admin_films_delete:
   path: /admin/films/delete/{id}
   controller: App\Controller\FilmController::delete
   requirements:
-    id: \d+  # Ensures that the 'id' is a number
+    id: \d+  
 
 
 
 
 
 #directory
-# config/routes/directory.yaml
 # Directors routes
 
 director_index:
@@ -117,7 +172,6 @@ director_delete:
 
 
 #category
-# config/routes/category.yaml
 
 category_index:
     path: /category
@@ -136,11 +190,8 @@ category_delete:
     controller: App\Controller\CategoryController::delete
  
  #series
-# config/routes.yaml
 
-series_index:
-    path: /series
-    controller: App\Controller\SeriesController::index
+
 
 series_create:
     path: /admin/series/create
@@ -162,7 +213,7 @@ series_delete:
 
 #cartoon 
 cartoon_index:
-    path: /cartoons
+    path: /admin/cartoons
     controller: App\Controller\CartoonsController::index
 
 cartoon_create:
@@ -181,7 +232,7 @@ cartoon_delete:
 #classics
 
 classical_index:
-    path: /classical
+    path: /admin/classical
     controller: App\Controller\ClassicalController::index
 
 classical_new:

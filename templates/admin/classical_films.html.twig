@@ -3,55 +3,98 @@
 {% block title %}Classical Films Management{% endblock %}
 
 {% block content %}
-  <!-- Classical Films CRUD -->
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <center>
-            <h5 class="card-title">Manage Classical Films</h5>
-          </center>
-          <a href="{{ path('classical_new') }}" class="btn btn-primary">Add New Classical Film</a>
+<!-- Add Classical Film -->
+<div class="row mb-4">
+    <div class="col-md-4 offset-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Manage Classical Films</h5>
+                <a href="{{ path('classical_new') }}" class="btn btn-primary w-100">Add New Classical Film</a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- Classical Films List -->
-  <div class="card">
-    <div class="card-body">
-      <center>
-        <h1 class="card-title">Classical Film List</h1>
-      </center>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Release Date</th>
-            <th scope="col">Price</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for film in films %}
-            <tr>
-              <td>{{ film.title }}</td>
-              <td>{{ film.description }}</td>
-              <td>{{ film.releaseDate|date('Y-m-d') }}</td>
-              <td>{{ film.price }}</td>
-              <td>
-                <a href="{{ path('classical_edit', { 'id': film.id }) }}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{{ path('classical_delete', { 'id': film.id }) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this film?')">Delete</a>
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="5" class="text-center">No classical films available</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<!-- Classical Film List -->
+<div class="card shadow-sm">
+    <div class="card-header text-center">
+        <h1 class="h4">Classical Film List</h1>
     </div>
-  </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead >
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Release Date</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Video</th>
+                    <th scope="col">Categories</th>
+                    <th scope="col">Directors</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                  {% for film in films %}
+                    <tr>
+                        <td>{{ film.title }}</td>
+                        <td class="text-truncate" style="max-width: 250px;">{{ film.description }}</td>
+                        <td>{{ film.releaseDate|date('Y-m-d') }}</td>
+                        <td>${{ film.price }}</td>
+                        <td>
+                            {% if film.imagePath %}
+                                <img src="{{ asset(film.imagePath) }}" alt="{{ film.title }}" class="img-thumbnail" style="width: 100px;">
+                            {% else %}
+                                <span class="text-muted">No Image Available</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if film.videoPath %}
+                                <video width="150" controls>
+                                    <source src="{{ asset(film.videoPath) }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% else %}
+                                <span class="text-muted">No Video Available</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for category in film.categories %}
+                                {{ category.name }}
+                                {% if not loop.last %}, 
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">No Categories</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for director in film.directors %}
+                                {{ director.name }}
+                                {% if not loop.last %}, {% endif %}
+                            {% else %}
+                                <span class="text-muted">No Directors</span>
+                            {% endfor %}
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{{ path('classical_edit', { 'id': film.id }) }}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                            <a href="{{ path('classical_delete', { 'id': film.id }) }}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Are you sure you want to delete this film?');">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No classical films available</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

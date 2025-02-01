@@ -120,7 +120,6 @@ class Film
         return $this;
     }
 
-    // Add/Remove Categories
     public function getCategories(): Collection
     {
         return $this->categories;
@@ -130,7 +129,7 @@ class Film
     {
         if (!$this->categories->contains($category)) {
             $this->categories[] = $category;
-            $category->addFilm($this); // Ensure 'addFilm' exists in Category entity
+            $category->addFilm($this); 
         }
 
         return $this;
@@ -139,13 +138,12 @@ class Film
     public function removeCategory(Category $category): self
     {
         if ($this->categories->removeElement($category)) {
-            $category->removeFilm($this); // Ensure 'removeFilm' exists in Category entity
+            $category->removeFilm($this); 
         }
 
         return $this;
     }
 
-    // Add/Remove Directors
     public function getDirectors(): Collection
     {
         return $this->directors;
@@ -155,7 +153,7 @@ class Film
     {
         if (!$this->directors->contains($director)) {
             $this->directors[] = $director;
-            $director->addFilm($this); // Ensure 'addFilm' exists in Director entity
+            $director->addFilm($this); 
         }
 
         return $this;
@@ -164,7 +162,7 @@ class Film
     public function removeDirector(Director $director): self
     {
         if ($this->directors->removeElement($director)) {
-            $director->removeFilm($this); // Ensure 'removeFilm' exists in Director entity
+            $director->removeFilm($this); 
         }
 
         return $this;

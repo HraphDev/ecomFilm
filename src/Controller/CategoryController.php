@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/CategoryController.php
 
 namespace App\Controller;
 
@@ -17,7 +16,6 @@ class CategoryController extends AbstractController
     #[Route('/category', name: 'category_index')]
     public function index(CategoryRepository $categoryRepository): Response
     {
-        // Retrieve all categories
         $categories = $categoryRepository->findAll();
 
         return $this->render('/admin/category.html.twig', [
@@ -31,10 +29,8 @@ class CategoryController extends AbstractController
         $category = new Category();
 
         if ($request->isMethod('POST')) {
-            // Manually process form data
             $category->setName($request->request->get('name'));
 
-            // Save the entity
             $entityManager->persist($category);
             $entityManager->flush();
 
@@ -48,10 +44,8 @@ class CategoryController extends AbstractController
     public function edit(Category $category, Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($request->isMethod('POST')) {
-            // Manually process form data
             $category->setName($request->request->get('name'));
 
-            // Save the updated entity
             $entityManager->flush();
 
             return $this->redirectToRoute('category_index');
@@ -65,9 +59,9 @@ class CategoryController extends AbstractController
     #[Route('/admin/category/delete/{id}', name: 'category_delete')]
     public function delete(Category $category, EntityManagerInterface $entityManager): Response
     {
-        $entityManager->remove($category);  // Remove the category from the database
-        $entityManager->flush();            // Commit the changes to the database
+        $entityManager->remove($category);  
+        $entityManager->flush();           
     
-        return $this->redirectToRoute('category_index');  // Redirect back to the category listing page
+        return $this->redirectToRoute('category_index'); 
     }
 }

@@ -3,6 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\ContactMessage;
+use App\Repository\FilmRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\CartoonRepository;
+use App\Repository\SeriesRepository;
+use App\Repository\ClassicalFilmRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,9 +17,39 @@ use Symfony\Component\Routing\Annotation\Route;
 final class ContactController extends AbstractController
 {
     #[Route('/contact', name: 'contact')]
-    public function index(Request $request, EntityManagerInterface $em): Response
-    {
+    public function index(
+        Request $request,
+        EntityManagerInterface $em,
+        FilmRepository $filmRepository,
+        CategoryRepository $categoryRepository,
+        CartoonRepository $cartoonRepository,
+        SeriesRepository $seriesRepository,
+        ClassicalFilmRepository $classicalFilmRepository
+    ): Response {
+        $films = $filmRepository->findAll();
+        $categories = $categoryRepository->findAll();
+        $cartoons = $cartoonRepository->findAll();
+        $series = $seriesRepository->findAll();
+        $classicalFilms = $classicalFilmRepository->findAll();
+
+        $moviesCategories = array_filter($categories, function($category) {
+            return count($category->getFilms()) > 0; 
+        });
+
+        $cartoonsCategories = array_filter($categories, function($category) {
+            return count($category->getCartoons()) > 0;
+        });
+
+        $seriesCategories = array_filter($categories, function($category) {
+            return count($category->getSeries()) > 0; 
+        });
+
+        $classicalFilmsCategories = array_filter($categories, function($category) {
+            return count($category->getClassicalFilms()) > 0; 
+        });
+
         $successMessage = null;
+        $errorMessage = null;
 
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
@@ -40,6 +75,10 @@ final class ContactController extends AbstractController
         return $this->render('contact/index.html.twig', [
             'successMessage' => $successMessage ?? null,
             'errorMessage' => $errorMessage ?? null,
+            'moviesCategories' => $moviesCategories,
+            'cartoonsCategories' => $cartoonsCategories,
+            'seriesCategories' => $seriesCategories,
+            'classicalFilmsCategories' => $classicalFilmsCategories, 
         ]);
     }
 }

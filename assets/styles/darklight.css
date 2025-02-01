@@ -1,32 +1,153 @@
+/* General theme styles */
 body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-  }
-  .card-header {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-    color: var(--text-primary) ;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
 
-  }
-  .card {
-    
-    background-color: var(--card-bg);
-    color: var(--text-primary) ;
-    border-color: var(--border-color);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-  }
+/* Card Styling for both sections */
+.card {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+/* Card Image */
+.card-img-top {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Card Body */
+.card-body {
+  background-color: var(--card-body-bg);
+  padding: 1rem;
+}
+
+/* Card Title and Text */
+.card-title {
+  color: var(--card-title-color);
+}
+
+/* Card Text */
+.card-text {
+  color: var(--card-text-color);
+}
+
+/* Button Styling */
+.card .btn {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: 4px;
+}
+
+/* Button Hover */
+.card .btn:hover {
+  background-color: var(--btn-bg-hover);
+}
+
+/* Dark and Light Mode Styling */
 [data-theme="dark"] {
-    --bg-primary: #212529;
-    --text-primary: #ffffff;
-    --card-bg: #2c3034;
-    --border-color: #373b3e;
-  }
-  
-  [data-theme="light"] {
-    --bg-primary: #ffffff;
-    --text-primary: #212529;
-    --card-bg: #ffffff;
-    --border-color: #dee2e6;
-  }
+  --bg-primary: #212529;
+  --text-primary: #ffffff;
+  --card-bg: #2c3034;
+  --card-body-bg: #2c3034;
+  --border-color: #373b3e;
+  --card-title-color: #ffffff;
+  --card-text-color: #c9c9c9;
+  --btn-bg: #007bff;
+  --btn-text: #ffffff;
+  --btn-bg-hover: #0056b3;
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --text-primary: #212529;
+  --card-bg: #ffffff;
+  --card-body-bg: #ffffff;
+  --border-color: #dee2e6;
+  --card-title-color: #212529;
+  --card-text-color: #636363;
+  --btn-bg: #007bff;
+  --btn-text: #ffffff;
+  --btn-bg-hover: #0056b3;
+}
+
+/* Cartoons List - Grid Layout */
+#cartoonList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.cartoon-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+}
+
+/* Card hover effect */
+.cartoon-item:hover {
+  transform: scale(1.05);
+}
+
+/* Individual Cartoon Card */
+.cartoon-item .card {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cartoon-item .card-img-top {
+  object-fit: cover;
+  height: 200px;
+}
+
+/* Card Body in Cartoon List */
+.cartoon-item .card-body {
+  background-color: var(--card-body-bg);
+}
+
+/* Light and Dark Modes for Cartoons */
+[data-theme="dark"] .cartoon-item .card {
+  background-color: var(--card-bg);
+}
+
+[data-theme="light"] .cartoon-item .card {
+  background-color: var(--card-bg);
+}
+
+/* Category and Price Section */
+.list-group-item {
+  color: var(--text-primary);
+  background-color: var(--card-body-bg);
+  border: none;
+}
+
+.list-group-item:hover {
+  background-color: var(--btn-bg-hover);
+}
+
+/* Adjusting for Cards in the Second Example (Card on the Right) */
+.col-md-4 .card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* Card Image in the second card */
+.col-md-4 .card-img-top {
+  max-height: 200px;
+  object-fit: cover;
+}
+
+/* Card Body in the second card */
+.col-md-4 .card-body {
+  background-color: var(--card-body-bg);
+  padding: 1rem;
+}

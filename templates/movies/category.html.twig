@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'partials/header.html.twig' %}
+<br><br>
+<body class="bg-gray-100">
+
+    <div class="max-w-screen-xl mx-auto px-4 py-8">
+    <br>
+        <h1 class="text-4xl font-bold text-center mb-8">Movies in "{{ category }}"</h1>
+
+        {% if films is not empty %}
+            <!-- Movie List -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 gap-4">
+                {% for film in films %}
+                    <div class="col film-item" data-title="{{ film.title | lower }}" data-description="{{ film.description | lower }}">
+                        <div class="card">
+                            <img src="{{ asset( film.imagePath) }}" alt="{{ film.title }}" class="card-img-top w-full h-48 object-cover rounded-t-lg">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-xl font-semibold text-gray-800">{{ film.title }}</h5>
+                                <p class="card-text text-gray-600 text-sm">{{ film.description | slice(0, 100) }}...</p>
+                                <p class="text-sm text-gray-600">Release Date: {{ film.releaseDate|date('Y-m-d') }}</p>
+                                <p class="text-sm text-gray-600">Price: ${{ film.price }}</p>
+                                <a href="/movies/{{ film.id }}" class="btn btn-primary text-white bg-blue-600 hover:bg-blue-700 mt-4 inline-block py-2 px-4 rounded-md">Watch Now</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-lg">No movies found in this category.</p>
+        {% endif %}
+
+    </div>
+
+    <script src="{{ asset('js/pagesFunc.js') }}"></script>
+
+    <style>
+        /* Custom styles for scrollbar */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
+{% include 'partials/footer.html.twig' %}
+</body>
+</html>

@@ -17,31 +17,36 @@ use App\Repository\SeriesRepository;
 use App\Repository\CartoonRepository;
 use App\Repository\ClassicalFilmRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ContactMessageRepository;
 class AdminController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
 
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
-    public function index()
+    public function index(ContactMessageRepository $contactMessageRepository): Response
     {
-        return $this->render('admin/index.html.twig');
+        $contactMessages = $contactMessageRepository->findAll();
+
+        return $this->render('admin/index.html.twig', [
+            'contactMessages' => $contactMessages, 
+        ]);
     }
+
 
     #[Route('/admin/movies', name: 'admin_movies')]
     public function movies(FilmRepository $filmRepository): Response
     {
         $films = $filmRepository->findAll();
 
-        // Pass films to the template
+  
         return $this->render('admin/movies.html.twig', [
-            'films' => $films,  // This line ensures films are passed to the Twig template
+            'films' => $films,
         ]);
     }
 
     #[Route('/admin/cartoons', name: 'admin_cartoons')]
     public function cartoons(CartoonRepository $cartoonRepository ,CategoryRepository $categoryRepo ): Response
     {
-        // Get all cartoons
         $cartoons = $cartoonRepository->findAll();
         $categories = $categoryRepo->findAll();
         return $this->render('admin/cartoons.html.twig', [
@@ -63,10 +68,10 @@ class AdminController extends AbstractController
     #[Route('/admin/users', name: 'admin_users')]
     public function users(UserRepository $userRepository): Response
     {
-           // Fetch all users from the database
+
            $users =  $userRepository->findAll();
 
-           // Render the user list in the 'admin/users.html.twig' template
+          
            return $this->render('admin/users.html.twig', [
                'users' => $users,
            ]);
@@ -75,10 +80,8 @@ class AdminController extends AbstractController
     #[Route('/admin/classical_films', name: 'admin_classical_films')]
     public function classicalFilms(ClassicalFilmRepository  $classicalFilmRepository ): Response
     {
-        // Get all classical films
         $films = $classicalFilmRepository->findAll();
 
-        // Render the films index page
         return $this->render('admin/classical_films.html.twig', [
             'films' => $films,
         ]);

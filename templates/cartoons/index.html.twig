@@ -1,20 +1,62 @@
 <!DOCTYPE html>
+<html lang="en">
 
-<title>Hello CartoonsController!</title>
+{% include 'partials/header.html.twig' %}
+<body class="bg-gray-100">
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="max-w-screen-xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8">Cartoons</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <!-- Search Bar -->
+        <div class="text-center mb-8">
+            <input type="text" id="searchInput" placeholder="Search Cartoons..." 
+                   class="border border-gray-300 p-3 rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                   oninput="filterCartoons()">
+        </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/xampp/htdocs/ecomFilm/src/Controller/CartoonsController.php</code></li>
-        <li>Your template at <code>C:/xampp/htdocs/ecomFilm/templates/cartoons/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+        <!-- Cartoon List -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 gap-4" id="cartoonList">
+            {% for cartoon in cartoons %}
+                <div class="col cartoon-item" data-title="{{ cartoon.title | lower }}" data-description="{{ cartoon.description | lower }}">
+                    <div class="card">
+                        <img src="{{ asset(cartoon.imagePath) }}" alt="{{ cartoon.title }}" class="card-img-top w-full h-48 object-cover rounded-t-lg">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-xl font-semibold text-gray-800">{{ cartoon.title }}</h5>
+                            <p class="card-text text-gray-600 text-sm">{{ cartoon.description | slice(0, 100) }}...</p>
+                            <a href="/cartoons/{{ cartoon.id }}" class="btn btn-primary text-white bg-blue-600 hover:bg-blue-700 mt-4 inline-block py-2 px-4 rounded-md">More Info</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+        function filterCartoons() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cartoons = document.querySelectorAll('.cartoon-item');
+
+            cartoons.forEach(cartoon => {
+                const title = cartoon.getAttribute('data-title');
+                const description = cartoon.getAttribute('data-description');
+                if (title.includes(filter) || description.includes(filter)) {
+                    cartoon.style.display = 'block'; 
+                } else {
+                    cartoon.style.display = 'none'; 
+                }
+            });
+        }
+    </script>
+
+    <script src="{{ asset('js/pagesFunc.js') }}"></script>
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
+{% include 'partials/footer.html.twig' %}
+</body>
+</html>

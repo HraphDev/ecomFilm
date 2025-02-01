@@ -15,7 +15,15 @@ class CartoonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Cartoon::class);
     }
-
+    public function findByCategoryName(string $categoryName)
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.categories', 'cat')
+            ->where('cat.name = :categoryName')
+            ->setParameter('categoryName', $categoryName)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Cartoon[] Returns an array of Cartoon objects
     //     */

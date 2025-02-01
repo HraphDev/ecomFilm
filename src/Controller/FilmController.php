@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/Admin/FilmController.php
 namespace App\Controller;
 
 use App\Entity\Film;
@@ -23,13 +22,13 @@ class FilmController extends AbstractController
     {
         $films = $filmRepository->findAll();
 
-        // Pass films to the template
         return $this->render('admin/movies.html.twig', [
-            'films' => $films,  // This line ensures films are passed to the Twig template
+            'films' => $films,
         ]);
     }
+
     #[Route(path: "/admin/films/create", name: "admin_films_create")]
-    public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo,  DirectorRepository $directorRepo): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepo, DirectorRepository $directorRepo): Response
     {
         if ($request->isMethod('POST')) {
             $film = new Film();
@@ -38,40 +37,41 @@ class FilmController extends AbstractController
             $film->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
             $film->setPrice((float)$request->request->get('price'));
 
-            // Handle Categories (ensure it's always an array)
-            $categoryIds = $request->request->get('categories');
-            $categoryIds = is_array($categoryIds) ? $categoryIds : (array)$categoryIds;
-            foreach ($categoryIds as $categoryId) {
+            $categoryIds = $request->request->all('categories') ?? [];
+            foreach ((array)$categoryIds as $categoryId) {
                 $category = $categoryRepo->find($categoryId);
                 if ($category) {
                     $film->addCategory($category);
                 }
             }
 
-           
-
-            // Handle Directors (ensure it's always an array)
-            $directorIds = $request->request->get('directors');
-            $directorIds = is_array($directorIds) ? $directorIds : (array)$directorIds;
-            foreach ($directorIds as $directorId) {
+            $directorIds = $request->request->all('directors') ?? [];
+            foreach ((array)$directorIds as $directorId) {
                 $director = $directorRepo->find($directorId);
                 if ($director) {
                     $film->addDirector($director);
                 }
             }
 
-            // Handle image and video paths (upload them if present)
             $imagePath = $request->files->get('imagePath');
             $videoPath = $request->files->get('videoPath');
-
-            if ($imagePath) {
-                $film->setImagePath($imagePath->getClientOriginalName()); // Save only file name
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
+                $newFilename = uniqid() . '.' . $imagePath->guessExtension();
+                $imagePath->move($uploadDir, $newFilename);
+                $film->setImagePath('uploads/images/' . $newFilename);
             }
-            if ($videoPath) {
-                $film->setVideoPath($videoPath->getClientOriginalName()); // Save only file name
+            
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
+                $newFilename = uniqid() . '.' . $videoPath->guessExtension();
+                $videoPath->move($uploadDir, $newFilename);
+                $film->setVideoPath('uploads/videos/' . $newFilename);
             }
 
-            // Save the film entity to the database
+            
+
             $entityManager->persist($film);
             $entityManager->flush();
 
@@ -79,7 +79,6 @@ class FilmController extends AbstractController
             return $this->redirectToRoute('admin_movies');
         }
 
-        // Fetch all categories, actors, and directors for the form
         $categories = $categoryRepo->findAll();
         $directors = $directorRepo->findAll();
 
@@ -88,6 +87,7 @@ class FilmController extends AbstractController
             'directors' => $directors,
         ]);
     }
+
     #[Route(path: "/admin/films/edit/{id}", name: "admin_films_edit")]
     public function edit(
         int $id,
@@ -97,94 +97,82 @@ class FilmController extends AbstractController
         DirectorRepository $directorRepo
     ): Response {
         $film = $entityManager->getRepository(Film::class)->find($id);
-    
+
         if (!$film) {
             $this->addFlash('error', 'Film not found!');
             return $this->redirectToRoute('admin_movies');
         }
-    
+
         if ($request->isMethod('POST')) {
             $film->setTitle($request->request->get('title'));
             $film->setDescription($request->request->get('description'));
             $film->setReleaseDate(new \DateTime($request->request->get('releaseDate')));
             $film->setPrice((float)$request->request->get('price'));
-    
-       // Handle Categories
-$categoryIds = $request->request->all('categories');
-if (!$categoryIds) {
-    $categoryIds = [];
-}
-$film->getCategories()->clear();
-foreach ($categoryIds as $categoryId) {
-    $category = $categoryRepo->find($categoryId);
-    if ($category) {
-        $film->addCategory($category);
-    }
-}
 
-// Handle Directors
-$directorIds = $request->request->all('directors');
-if (!$directorIds) {
-    $directorIds = [];
-}
-$film->getDirectors()->clear();
-foreach ($directorIds as $directorId) {
-    $director = $directorRepo->find($directorId);
-    if ($director) {
-        $film->addDirector($director);
-    }
-}
+            $categoryIds = $request->request->all('categories') ?? [];
+            $film->getCategories()->clear();
+            foreach ((array)$categoryIds as $categoryId) {
+                $category = $categoryRepo->find($categoryId);
+                if ($category) {
+                    $film->addCategory($category);
+                }
+            }
 
-            // Handle image and video paths (upload them if present)
+            $directorIds = $request->request->all('directors') ?? [];
+            $film->getDirectors()->clear();
+            foreach ((array)$directorIds as $directorId) {
+                $director = $directorRepo->find($directorId);
+                if ($director) {
+                    $film->addDirector($director);
+                }
+            }
+
             $imagePath = $request->files->get('imagePath');
             $videoPath = $request->files->get('videoPath');
-    
-            if ($imagePath) {
-                $uploadDir = 'uploads/images';
+            if ($imagePath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images/';
                 $newFilename = uniqid() . '.' . $imagePath->guessExtension();
                 $imagePath->move($uploadDir, $newFilename);
-                $film->setImagePath($newFilename);
+                $film->setImagePath('uploads/images/' . $newFilename);
             }
-    
-            if ($videoPath) {
-                $uploadDir = 'uploads/videos';
+            
+            $videoPath = $request->files->get('videoPath');
+            if ($videoPath instanceof UploadedFile) {
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/';
                 $newFilename = uniqid() . '.' . $videoPath->guessExtension();
                 $videoPath->move($uploadDir, $newFilename);
-                $film->setVideoPath($newFilename);
+                $film->setVideoPath('uploads/videos/' . $newFilename);
             }
-    
-            // Save the updated film entity to the database
             $entityManager->flush();
-    
+
             $this->addFlash('success', 'Film updated successfully!');
             return $this->redirectToRoute('admin_movies');
         }
-    
-        // Fetch all categories and directors for the form
+
         $categories = $categoryRepo->findAll();
         $directors = $directorRepo->findAll();
-    
+
         return $this->render('admin/films/edit.html.twig', [
             'film' => $film,
             'categories' => $categories,
             'directors' => $directors,
         ]);
     }
-    #[Route(path: "/admin/films/delete/{id}", name: "admin_films_delete")]
-public function delete(int $id, EntityManagerInterface $entityManager): Response
-{
-    $film = $entityManager->getRepository(Film::class)->find($id);
 
-    if (!$film) {
-        $this->addFlash('error', 'Film not found!');
+    #[Route(path: "/admin/films/delete/{id}", name: "admin_films_delete")]
+    public function delete(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $film = $entityManager->getRepository(Film::class)->find($id);
+
+        if (!$film) {
+            $this->addFlash('error', 'Film not found!');
+            return $this->redirectToRoute('admin_movies');
+        }
+
+        $entityManager->remove($film);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Film deleted successfully!');
         return $this->redirectToRoute('admin_movies');
     }
-
-    $entityManager->remove($film);
-    $entityManager->flush();
-
-    $this->addFlash('success', 'Film deleted successfully!');
-    return $this->redirectToRoute('admin_movies');
 }
-
-}    

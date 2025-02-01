@@ -15,7 +15,15 @@ class SeriesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Series::class);
     }
-
+    public function findByCategoryName(string $categoryName)
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.categories', 'cat')
+            ->where('cat.name = :categoryName')
+            ->setParameter('categoryName', $categoryName)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Series[] Returns an array of Series objects
     //     */

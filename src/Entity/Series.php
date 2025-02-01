@@ -33,10 +33,10 @@ class Series
     #[ORM\Column(type: 'date')]
     private $releaseDate;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ORM\Column(type:"string", length:255, nullable:true)]
     private $imagePath;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ORM\Column(type:"string", length:255, nullable:true)]
     private $videoPath;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'series')]
@@ -147,7 +147,6 @@ class Series
         return $this;
     }
 
-    // Add/Remove Categories
     public function getCategories(): Collection
     {
         return $this->categories;
@@ -157,7 +156,7 @@ class Series
     {
         if (!$this->categories->contains($category)) {
             $this->categories[] = $category;
-            $category->addSeries($this); // Ensure 'addSeries' exists in Category
+            $category->addSeries($this); 
         }
 
         return $this;
@@ -166,13 +165,12 @@ class Series
     public function removeCategory(Category $category): self
     {
         if ($this->categories->removeElement($category)) {
-            $category->removeSeries($this); // Ensure 'removeSeries' exists in Category
+            $category->removeSeries($this);
         }
 
         return $this;
     }
 
-    // Add/Remove Directors
     public function getDirectors(): Collection
     {
         return $this->directors;

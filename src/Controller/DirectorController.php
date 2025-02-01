@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/DirectorController.php
 
 namespace App\Controller;
 
@@ -17,7 +16,6 @@ class DirectorController extends AbstractController
     #[Route('/director', name: 'director_index')]
     public function index(DirectorRepository $directorRepository): Response
     {
-        // Retrieve all directors
         $directors = $directorRepository->findAll();
 
         return $this->render('admin/director.html.twig', [
@@ -31,14 +29,11 @@ class DirectorController extends AbstractController
         $director = new Director();
 
         if ($request->isMethod('POST')) {
-            // Manually process form data
             $director->setName($request->request->get('name'));
 
-            // Save the entity
             $entityManager->persist($director);
             $entityManager->flush();
 
-            // Redirect to the director's list page
             return $this->redirectToRoute('director_index');
         }
 
@@ -50,13 +45,10 @@ class DirectorController extends AbstractController
     public function edit(Director $director, Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($request->isMethod('POST')) {
-            // Manually process form data
             $director->setName($request->request->get('name'));
 
-            // Save the updated entity
             $entityManager->flush();
 
-            // Redirect to the director's list page
             return $this->redirectToRoute('director_index');
         }
 
@@ -68,11 +60,9 @@ class DirectorController extends AbstractController
     #[Route('/admin/director/delete/{id}', name: 'director_delete')]
     public function delete(Director $director, EntityManagerInterface $entityManager): Response
     {
-        // Remove the director entity from the database
         $entityManager->remove($director);
         $entityManager->flush();
 
-        // Redirect to the director's list page
         return $this->redirectToRoute('director_index');
     }
 }
